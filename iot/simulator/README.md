@@ -1,6 +1,14 @@
-# Simulador IoT
+# Simulador IoT — SmartBand
 
-O simulador deve representar um dispositivo IoT e produzir mensagens de telemetria compatíveis com o contrato acordado para o Saúde Conectada.
+O projeto utilizará um único simulador que representa uma SmartBand e reúne dados de diferentes sensores. Não serão criados simuladores independentes para cada sensor neste incremento.
+
+## Fluxo
+
+O simulador envia as mensagens diretamente à API REST PHP 8, sem intermediador. O backend é responsável por receber e validar os dados.
+
+## Tipos de dados simulados
+
+Os cenários podem representar medições de oxigenação, temperatura, frequência cardíaca, pressão arterial, além de eventos como queda e acionamento do botão de auxílio, conforme o escopo de sensores confirmado no projeto.
 
 ## Cenários mínimos
 
@@ -13,7 +21,8 @@ O simulador deve representar um dispositivo IoT e produzir mensagens de telemetr
 
 - Usar apenas dados fictícios.
 - Não inventar limites clínicos.
-- Não fixar protocolo antes da decisão registrada.
+- Utilizar o contrato interno versionado em `docs/contracts/`.
+- Não implementar intermediador no fluxo planejado.
 - Não manter um formato divergente do contrato consumido pela API.
 
 A implementação será detalhada na Issue do simulador do Incremento 1.
