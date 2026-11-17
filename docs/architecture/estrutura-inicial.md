@@ -1,14 +1,27 @@
 # Estrutura inicial do repositório
 
-> Status: proposta inicial de organização. A estrutura não aprova frameworks, bibliotecas ou contratos que estejam pendentes na especificação-base.
+> Status: proposta inicial de organização. A estrutura não aprova frameworks, bibliotecas ou detalhes de contrato que ainda estejam pendentes.
+
+## Contexto e fluxo confirmado
+
+SmartCity Lab é o contexto acadêmico em que o Saúde Conectada está inserido, não um sistema externo ou plataforma de integração.
+
+O Incremento 1 prevê um único simulador que representa uma SmartBand com vários sensores. O simulador envia telemetria diretamente à API REST PHP 8, sem intermediador. O backend recebe e valida os dados.
+
+A arquitetura do Saúde Conectada é responsável por definir o contrato interno padronizado utilizado pelo simulador e pelo backend.
+
+`Simulador SmartBand → comunicação direta → API REST PHP 8`
+
+A persistência em MariaDB está prevista para o Incremento 2.
 
 ## Princípios
 
-1. Manter a arquitetura de referência: dispositivo/simulador → comunicação HTTP e/ou MQTT → API REST PHP 8.
-2. Separar documentação, backend, simuladores e testes.
-3. Evitar dependências e decisões irreversíveis antes das aprovações necessárias.
-4. Usar dados fictícios ou anonimizados em exemplos e testes.
-5. Não versionar credenciais, tokens, arquivos locais ou dados pessoais reais.
+1. Manter o fluxo interno entre simulador, comunicação e API REST PHP 8.
+2. Não introduzir plataforma ou contrato externo SmartCity Lab.
+3. Compartilhar um contrato interno versionado entre simulador e backend.
+4. Separar documentação, backend, simulador e testes.
+5. Usar dados fictícios ou anonimizados em exemplos e testes.
+6. Não versionar credenciais, tokens, arquivos locais ou dados pessoais reais.
 
 ## Estrutura planejada
 
@@ -20,7 +33,7 @@ SaudeConectada/
 │   ├── config/             # Configurações não secretas e exemplos
 │   └── README.md
 ├── iot/
-│   └── simulator/          # Simulador e cenários de telemetria
+│   └── simulator/          # Simulador único da SmartBand
 ├── docs/
 │   ├── architecture/
 │   ├── contracts/
@@ -39,9 +52,9 @@ SaudeConectada/
 
 - Framework ou PHP puro.
 - Organização interna definitiva do backend (MVC simplificado é proposta).
-- Protocolo final HTTP, MQTT ou ambos.
-- Contrato oficial de telemetria do SmartCity Lab.
-- Autenticação e credenciais dos dispositivos.
+- Detalhes finais do protocolo HTTP e eventual necessidade futura de MQTT.
+- Estrutura definitiva do envelope e cardinalidade das medições por mensagem.
+- Autenticação e credenciais do dispositivo.
 - Formato definitivo de erros e respostas HTTP.
 
 ## Regras de contribuição
