@@ -33,6 +33,7 @@ const $=id=>document.getElementById(id);
 function log(message,kind='info'){const line=document.createElement('div');line.textContent='['+new Date().toLocaleTimeString()+'] '+message;line.style.color=kind==='error'?'#dc3545':kind==='success'?'#198754':'#212529';$('log').append(line);$('log').scrollTop=$('log').scrollHeight}
 function buildPayload(){
  const metric=$('metric').value,raw=$('value').value.trim();let value,unit;
+ if(!raw)throw Error('Informe um valor para a métrica selecionada.');
  if(metric==='spo2'||metric==='heart_rate'||metric==='temperature'){value=Number(raw);if(!Number.isFinite(value))throw Error('Valor deve ser numérico.');unit=metric==='spo2'?'%':metric==='heart_rate'?'bpm':'°C'}
  else if(metric==='blood_pressure'){const m=raw.match(/^(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/);if(!m)throw Error('Pressão deve estar no formato 120/80.');value={systolic:Number(m[1]),diastolic:Number(m[2])};unit='mmHg'}
  else {if(!['true','false'].includes(raw.toLowerCase()))throw Error('Evento deve ser true ou false.');value=raw.toLowerCase()==='true'}
