@@ -1,0 +1,21 @@
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Dependencies
+/vendor/
+/node_modules/
+
+# Runtime and logs
+*.log
+/storage/
+/tmp/
+
+# Editor and operating system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
