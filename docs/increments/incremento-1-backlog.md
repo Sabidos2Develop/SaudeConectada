@@ -1,55 +1,59 @@
 # Incremento 1 — Comunicação e coleta de dados
 
-**Objetivo:** estabelecer a comunicação entre dispositivo/simulador e API.
+**Objetivo:** estabelecer e testar o fluxo de telemetria entre o simulador único da SmartBand e a API REST PHP 8.
 
-**Fluxo esperado:** Dispositivo/Simulador → Comunicação → API REST PHP 8.
+**Fluxo confirmado:** Simulador SmartBand → comunicação direta (sem intermediador) → API REST PHP 8.
 
-**Escopo confirmado pela especificação-base:**
-- Criar ou configurar simulador.
-- Definir mensagens de telemetria.
-- Implementar recebimento na API.
-- Validar dados recebidos.
-- Testar a comunicação.
+**Responsabilidade:** a arquitetura do Saúde Conectada define o contrato interno padronizado; o backend recebe e valida as mensagens.
+
+## Escopo confirmado
+
+- Um único simulador representa uma SmartBand que reúne medições de diferentes sensores.
+- O simulador envia telemetria diretamente à API.
+- A API é responsável pelo recebimento e validação.
+- O contrato de dados é interno ao Saúde Conectada.
+- Não há integração técnica externa com SmartCity Lab.
 
 ## Backlog proposto
 
 | Ordem | Item | Resultado esperado | Dependência / observação |
 |---|---|---|---|
-| 1 | Consultar contrato oficial SmartCity Lab | Requisitos de integração identificados e divergências registradas | Bloqueador para fechar o contrato |
-| 2 | Registrar decisão de protocolo e autenticação | Decisão humana documentada | Não assumir HTTP/MQTT nem credencial |
-| 3 | Especificar contrato de telemetria | Campos, tipos, unidades, identificação, timestamp e validações documentados | Provisório até confirmação oficial |
-| 4 | Preparar esqueleto mínimo da API PHP 8 | Aplicação executável e ponto de entrada REST | Framework permanece pendente |
-| 5 | Implementar recebimento de telemetria | Endpoint recebe requisição conforme contrato aprovado/provisório | Sem persistência neste incremento, salvo decisão explícita |
-| 6 | Validar mensagens no servidor | Mensagens inválidas são rejeitadas e não tratadas como medições válidas | Não criar limites clínicos |
-| 7 | Implementar simulador IoT | Envio de cenários válidos, anômalos e inválidos | Seguir o mesmo contrato |
-| 8 | Integrar simulador e API | Fluxo de comunicação demonstrável | Protocolo depende da decisão |
-| 9 | Criar testes de comunicação e validação | Evidências de sucesso, rejeição e falhas | QA revisa |
-| 10 | Documentar execução e limitações | Guia reproduzível do fluxo | DevOps/documentação |
+| 1 | Definir contrato interno de telemetria | Campos, tipos, unidades, identificação, timestamp e validações documentados | Responsabilidade da arquitetura |
+| 2 | Registrar decisão de protocolo e segurança | Comunicação direta simulador → API definida e aprovada | Considerar HTTP como caminho natural para API REST; avaliar necessidade real de MQTT |
+| 3 | Preparar esqueleto mínimo da API PHP 8 | Aplicação executável e ponto de entrada REST | Framework permanece pendente |
+| 4 | Implementar recebimento de telemetria | Endpoint recebe requisição conforme contrato interno | Sem persistência definitiva neste incremento |
+| 5 | Validar mensagens no servidor | Mensagens inválidas são rejeitadas e não tratadas como medições válidas | Não criar limites clínicos |
+| 6 | Implementar simulador único da SmartBand | Cenários de diferentes sensores e envio direto à API | Seguir o mesmo contrato |
+| 7 | Integrar simulador e API | Fluxo direto demonstrável, sem intermediador | Protocolo depende da decisão |
+| 8 | Criar testes de comunicação e validação | Evidências de sucesso, rejeição e falhas | QA revisa |
+| 9 | Documentar execução e limitações | Guia reproduzível do fluxo | DevOps/documentação |
 
 ## Critérios de aceite do incremento
 
-- [ ] O simulador produz mensagens compatíveis com o contrato acordado.
+- [ ] Existe um simulador único representando a SmartBand.
+- [ ] O simulador gera dados fictícios de diferentes tipos de medição.
+- [ ] O simulador envia diretamente à API, sem intermediador.
+- [ ] Simulador e API utilizam a mesma versão documentada do contrato interno.
 - [ ] A API PHP 8 recebe mensagens pelo protocolo aprovado.
 - [ ] A API valida os dados no servidor antes de tratá-los como válidos.
 - [ ] Mensagens inválidas não são aceitas como medições válidas.
-- [ ] Falhas de comunicação e erros de validação são identificáveis/registrados.
+- [ ] Falhas de comunicação e erros de validação são identificáveis.
 - [ ] Há testes executados para cenários válidos, inválidos e falhas de comunicação.
 - [ ] O contrato e a forma de execução estão documentados.
-- [ ] A solução permanece compatível com o contrato comum do SmartCity Lab.
-- [ ] QA revisou os resultados e a equipe humana validou decisões pendentes relevantes.
+- [ ] QA revisou os resultados e decisões pendentes relevantes foram validadas pela equipe.
 
 ## Fora do escopo deste incremento
 
 - Persistência definitiva e histórico em MariaDB (Incremento 2).
 - Regras clínicas e limites de alerta não aprovados.
 - Funcionalidades de IA.
-- Autenticação final de dispositivos antes da decisão de segurança correspondente.
+- Autenticação final do dispositivo antes da decisão de segurança correspondente.
 
-## Riscos e bloqueios
+## Riscos e decisões pendentes
 
-1. O contrato oficial SmartCity Lab ainda não foi fornecido.
-2. HTTP, MQTT ou ambos ainda não foram escolhidos.
-3. Campos, unidades, identificação do dispositivo e timestamp precisam ser confirmados.
-4. Autenticação, retentativas, QoS e tratamento de duplicidade dependem do protocolo/contrato.
+1. Protocolo de comunicação direta e mecanismo de segurança ainda precisam ser registrados.
+2. O contrato precisa definir se cada requisição transporta várias medições ou uma medição por mensagem.
+3. Campos, tipos, unidades, identificação do dispositivo e timestamp precisam ser especificados.
+4. Autenticação, retentativas e tratamento de duplicidade dependem das decisões de protocolo e contrato.
 
-Não tratar exemplos técnicos como decisões oficiais.
+Não existe dependência de contrato, aprovação ou integração externa do SmartCity Lab.
