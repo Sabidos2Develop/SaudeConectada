@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulador SmartBand — Saúde Conectada</title>
+<style>
+:root{font-family:Arial,sans-serif;color:#212529;background:#f4f6f9}body{margin:0;padding:24px}.wrap{max-width:1100px;margin:auto}header{text-align:center;margin-bottom:24px}h1{color:#0d6efd}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.card{background:white;border:1px solid #dee2e6;border-radius:10px;padding:20px;box-shadow:0 3px 12px #0000000a}label{display:block;font-weight:bold;margin:12px 0 5px}input,select{width:100%;padding:10px;border:1px solid #ced4da;border-radius:6px;box-sizing:border-box}button{padding:11px 14px;border:0;border-radius:6px;color:white;font-weight:bold;cursor:pointer;margin:10px 5px 0 0}.primary{background:#0d6efd}.success{background:#198754}.danger{background:#dc3545}pre{background:#212529;color:#f8f9fa;padding:15px;border-radius:7px;overflow:auto;min-height:150px}.log{max-height:220px;overflow:auto;font-family:monospace;font-size:.85rem}.muted{color:#6c757d;font-size:.9rem}.status{font-weight:bold}.row{display:flex;gap:8px}.row button{flex:1}@media(max-width:760px){.grid{grid-template-columns:1fr}body{padding:12px}}
+</style></head>
+<body><main class="wrap">
+<header><h1>Saúde Conectada</h1><p>Simulador único de SmartBand — contrato interno de telemetria v1.0</p></header>
+<div class="grid">
+<section class="card"><h2>Dispositivo e medição</h2>
+<label for="deviceId">ID único da SmartBand</label><input id="deviceId" value="smartband-01" readonly>
+<label for="patientId">ID anonimizado do paciente</label><input id="patientId" value="pat-9921">
+<label for="metric">Sensor / métrica</label><select id="metric">
+<option value="spo2">Oxigenação (SpO2)</option><option value="heart_rate">Frequência cardíaca</option><option value="temperature">Temperatura</option><option value="blood_pressure">Pressão arterial</option><option value="fall_sensor">Sensor de queda</option><option value="panic_button">Botão de auxílio</option></select>
+<label for="value">Valor</label><input id="value" value="98">
+<label for="endpoint">Endpoint da API</label><input id="endpoint" type="url" value="http://localhost:8000/api/v1/telemetry">
+<label for="interval">Intervalo da simulação</label><select id="interval"><option value="5000">5 segundos</option><option value="10000">10 segundos</option><option value="30000">30 segundos</option></select>
+<p class="muted">Cada envio contém uma medição/evento. A pressão arterial é um único objeto com sistólica e diastólica.</p>
+<div class="row"><button class="success" id="send">Enviar leitura</button><button class="primary" id="toggle">Iniciar simulação</button></div>
+</section>
+<section>
+<div class="card"><h2>Payload JSON <span class="status" id="status">Parado</span></h2><pre id="payload"></pre></div>
+<div class="card"><h2>Log de comunicação</h2><div class="log" id="log">[Sistema] Aguardando ação.</div><button class="danger" id="clear">Limpar log</button></div>
+</section></div></main>
+<script>
+const DEVICE_ID='smartband-01';
+const metrics=['spo2','heart_rate','temperature','blood_pressure','fall_sensor','panic_button'];
+const defaults={spo2:'98',heart_rate:'85',temperature:'36.5',blood_pressure:'120/80',fall_sensor:'false',panic_button:'false'};
+let timer=null,index=0,running=false;
+const $=id=>document.getElementById(id);
+function log(message,kind='info'){const line=document.createElement('div');line.textContent='['+new Date().toLocaleTimeString()+'] '+message;line.style.color=kind==='error'?'#dc3545':kind==='success'?'#198754':'#212529';$('log').append(line);$('log').scrollTop=$('log').scrollHeight}
+function buildPayload(){
+ const metric=$('metric').value,raw=$('value').value.trim();let value,unit;
+ if(metric==='spo2'||metric==='heart_rate'||metric==='temperature'){value=Number(raw);if(!Number.isFinite(value))throw Error('Valor deve ser numérico.');unit=metric==='spo2'?'%':metric==='heart_rate'?'bpm':'°C'}
+ else if(metric==='blood_pressure'){const m=raw.match(/^(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/);if(!m)throw Error('Pressão deve estar no formato 120/80.');value={systolic:Number(m[1]),diastolic:Number(m[2])};unit='mmHg'}
+ else {if(!['true','false'].includes(raw.toLowerCase()))throw Error('Evento deve ser true ou false.');value=raw.toLowerCase()==='true'}
+ const p={schema_version:'1.0',device_id:DEVICE_ID,patient_id:$('patientId').value.trim(),metric,value};if(unit)p.unit=unit;p.timestamp=new Date().toISOString();
+ if(!p.patient_id)throw Error('Informe patient_id anonimizado.');return p;
+}
+function render(){try{$('payload').textContent=JSON.stringify(buildPayload(),null,2)}catch(e){$('payload').textContent='Payload inválido: '+e.message}}
+async function send(){let p;try{p=buildPayload()}catch(e){log(e.message,'error');render();return}
+ const url=$('endpoint').value.trim();if(!url){log('Informe o endpoint da API.','error');return}
+ $('payload').textContent=JSON.stringify(p,null,2);log('POST '+url+' — '+p.metric);
+ try{const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(p)});const body=await res.text();if(!res.ok){log('API respondeu HTTP '+res.status+': '+body,'error');return}log('Resposta HTTP '+res.status+': '+(body||'sem corpo de resposta'),'success')}
+ catch(e){log('Falha de rede/CORS: '+e.message+'. Verifique API, URL e CORS.','error')}
+}
+function setMetric(metric){$('metric').value=metric;$('value').value=defaults[metric];render()}
+$('metric').addEventListener('change',()=>{$('value').value=defaults[$('metric').value];render()});
+['patientId','value'].forEach(id=>$(id).addEventListener('input',render));
+$('send').addEventListener('click',send);
+$('toggle').addEventListener('click',()=>{if(!running){running=true;index=0;$('toggle').textContent='Parar simulação';$('status').textContent='Executando';log('Simulação iniciada: alternância entre seis métricas.','success');send();timer=setInterval(()=>{index=(index+1)%metrics.length;setMetric(metrics[index]);send()},Number($('interval').value))}else{running=false;clearInterval(timer);timer=null;$('toggle').textContent='Iniciar simulação';$('status').textContent='Parado';log('Simulação interrompida.')}});
+$('clear').addEventListener('click',()=>$('log').textContent='[Log limpo]');
+render();
+</script></body></html>
