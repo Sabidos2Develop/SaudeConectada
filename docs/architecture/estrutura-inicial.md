@@ -1,39 +1,40 @@
 # Estrutura inicial do repositório
 
-> Status: proposta inicial de organização. A estrutura não aprova frameworks, bibliotecas ou detalhes de contrato que ainda estejam pendentes.
+> Status: proposta inicial de organização. A estrutura não aprova frameworks, bibliotecas ou detalhes ainda pendentes.
 
-## Contexto e fluxo confirmado
+## Contexto e fluxo acordado
 
 SmartCity Lab é o contexto acadêmico em que o Saúde Conectada está inserido, não um sistema externo ou plataforma de integração.
 
-O Incremento 1 prevê um único simulador que representa uma SmartBand com vários sensores. O simulador envia telemetria diretamente à API REST PHP 8, sem intermediador. O backend recebe e valida os dados.
+O Incremento 1 utiliza um único simulador que representa uma SmartBand com vários sensores. O simulador envia telemetria diretamente à API REST PHP 8 por HTTP + JSON, sem intermediador. O backend recebe e valida os dados.
 
-A arquitetura do Saúde Conectada é responsável por definir o contrato interno padronizado utilizado pelo simulador e pelo backend.
+`Simulador SmartBand (smartband-01) → HTTP POST + JSON → API REST PHP 8`
 
-`Simulador SmartBand → comunicação direta → API REST PHP 8`
+Cada requisição transporta uma medição ou evento. A pressão arterial é uma medição composta com dois valores no mesmo objeto. O contrato está em `docs/contracts/telemetry-v1.md`.
 
-A persistência em MariaDB está prevista para o Incremento 2.
+A persistência definitiva em MariaDB está prevista para o Incremento 2.
 
 ## Princípios
 
 1. Manter o fluxo interno entre simulador, comunicação e API REST PHP 8.
 2. Não introduzir plataforma ou contrato externo SmartCity Lab.
-3. Compartilhar um contrato interno versionado entre simulador e backend.
+3. Compartilhar contrato interno versionado entre simulador e backend.
 4. Separar documentação, backend, simulador e testes.
-5. Usar dados fictícios ou anonimizados em exemplos e testes.
-6. Não versionar credenciais, tokens, arquivos locais ou dados pessoais reais.
+5. Usar dados fictícios ou anonimizados.
+6. Não versionar credenciais, tokens ou dados pessoais reais.
+7. Não criar limites clínicos sem fonte e aprovação.
 
-## Estrutura planejada
+## Estrutura
 
 ```text
 SaudeConectada/
 ├── backend/
-│   ├── public/             # Ponto de entrada HTTP da API
-│   ├── src/                # Código da aplicação (organização interna pendente)
-│   ├── config/             # Configurações não secretas e exemplos
+│   ├── public/
+│   ├── src/
+│   ├── config/
 │   └── README.md
 ├── iot/
-│   └── simulator/          # Simulador único da SmartBand
+│   └── simulator/
 ├── docs/
 │   ├── architecture/
 │   ├── contracts/
@@ -48,19 +49,19 @@ SaudeConectada/
 └── README.md
 ```
 
-## Decisões ainda não aprovadas
+## Pendências técnicas
 
 - Framework ou PHP puro.
-- Organização interna definitiva do backend (MVC simplificado é proposta).
-- Detalhes finais do protocolo HTTP e eventual necessidade futura de MQTT.
-- Estrutura definitiva do envelope e cardinalidade das medições por mensagem.
+- Organização interna definitiva do backend.
 - Autenticação e credenciais do dispositivo.
-- Formato definitivo de erros e respostas HTTP.
+- HTTPS para ambientes publicados.
+- Timeout, retentativas, idempotência e limites operacionais.
+- CORS e contrato definitivo de erros/respostas HTTP.
 
 ## Regras de contribuição
 
-- Desenvolver em branches de trabalho e abrir Pull Request para integração na `main`.
-- Não fazer commits diretamente na `main` durante o desenvolvimento colaborativo.
+- Desenvolver em branches e abrir Pull Request para integração na `main`.
+- Não fazer commits diretamente na `main`.
 - Toda mudança funcional deve apontar para uma Issue.
-- PR deve descrever alteração, requisito relacionado, testes executados, limitações e decisões pendentes.
-- Não marcar testes como aprovados sem evidência de execução.
+- PR deve descrever alteração, requisito, testes executados, limitações e pendências.
+- Não declarar testes aprovados sem evidência.
