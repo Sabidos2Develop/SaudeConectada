@@ -1,0 +1,6 @@
+# Composer dependencies generated inside this project
+/vendor/
+
+# Local environment files
+.env
+.env.*
