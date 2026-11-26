@@ -24,7 +24,7 @@
 | 3 | Esqueleto da API | API PHP 8 executável | Issue #4 |
 | 4 | Validação | Validação server-side conforme SC-TELEMETRY v1.0 | Esqueleto (#4) e contrato (#3) |
 | 5 | Endpoint | Recebimento via POST e integração com o validador | Esqueleto (#4), contrato (#3) e validação (#6) |
-| 6 | Simulador | SmartBand única, alternância de métricas e envio HTTP real | Contrato (#3) e endpoint (#5) |
+| 6 | Simulador | SmartBand única, alternância de métricas e envio HTTP real | Contrato (#3) |
 | 7 | Integração e QA | Testes reais simulador → API | Endpoint (#5), validação (#6) e simulador (#7) |
 | 8 | Documentação | Guia reproduzível e limitações | Fluxo implementado e resultados de QA |
 
