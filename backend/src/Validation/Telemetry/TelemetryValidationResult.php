@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SaudeConectada\\Backend\\Validation\\Telemetry;
+namespace SaudeConectada\Backend\Validation\Telemetry;
 
 final class TelemetryValidationResult
 {
