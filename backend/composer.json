@@ -1,0 +1,17 @@
+{
+  "name": "sabidos2develop/saude-conectada-api",
+  "description": "API REST do projeto Saúde Conectada, desenvolvida em PHP puro.",
+  "type": "project",
+  "require": {
+    "php": "^8.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "SaudeConectada\\Backend\\": "src/"
+    }
+  },
+  "scripts": {
+    "serve": "php -S 127.0.0.1:8080 -t public public/index.php",
+    "test": "php ../tests/backend-smoke.php"
+  }
+}
